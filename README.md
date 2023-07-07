@@ -1,83 +1,61 @@
 # Reason
 
-Demo for using AWS ECR registry with AWS EKS cluster 
+Mastering AWS skills. 
+Exercise for using AWS ECR registry with AWS EKS cluster and test rolling update.
 
 # Prereqisites
 
-aws configure
+- aws cli configured
+- eksctl command installed
+- kubectl command installed
 
-eksctl create cluster -f cluster-config.yaml 
+# Aws cli configuration
 
-aws eks --region us-west-2  update-kubeconfig --name eks-hpa
+`aws configure`
 
+# Cluster creation
 
-# Deploy fargate node EKS cluster
+`eksctl create cluster -f cluster-config.yaml`
 
-k apply -f deplyment.yaml
+# Kubectl configuration update
 
-kubectl get pods -l 'app=nginx' -o wide | awk {'print $1" " $3 " " $6'} | column -t
+`aws eks --region us-west-2  update-kubeconfig --name eks-hpa`
 
-Application load balancer
+# Apply k8s deployment
 
-https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html
+`kubectl apply -f deployment.yaml`
 
+# Apply k8s service
 
-https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html
+`kubectl apply -f service.yaml`
 
-https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
+# Test pods
 
-# Install OIDC provider 
+`kubectl get pods`
 
-Check OIDC Provider is installed
+check if status is `RUNNING'
 
-export cluster_name=eks-fargate-hpa
+`kubectl describe pods` 
 
+check image version
 
-oidc_id=$(aws eks describe-cluster --name $cluster_name --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5)
+# Update image version
 
+Edit and save deployment.yaml
 
-eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve
+# Apply updated manifest
 
+`kubectl apply -f deployment.yaml`
 
-# Install IAM policy 
+# Observe pods behaviour
 
-curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.4.7/docs/install/iam_policy.json
+`kubectl get pods`
 
-aws iam create-policy \
-    --policy-name AWSLoadBalancerControllerIAMPolicy \
-    --policy-document file://iam_policy.json
+check what's happen with a pods
 
+`kubectl describe pods` 
 
-# Create IAM role
-
-eksctl create iamserviceaccount \
-  --cluster=$CLUSTER_NAME \
-  --namespace=kube-system \
-  --name=aws-load-balancer-controller \
-  --role-name AmazonEKSLoadBalancerControllerRole \
-  --attach-policy-arn=arn:aws:iam::792300178540:policy/AWSLoadBalancerControllerIAMPolicy \
-  --approve
-
-  # Install AWS ALB Ingress Controller for Kubernetes
-
-helm repo add eks https://aws.github.io/eks-charts
-
-helm repo update eks
-
-# Instal. AWS Load Balancer controller
-
-
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
-  -n kube-system \
-  --set clusterName=$CLUSTER_NAME \
-  --set serviceAccount.create=false \
-  --set serviceAccount.name=aws-load-balancer-controller 
-
-
-
-
-
-
+check image version
 
 # Delete resources
 
