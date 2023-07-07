@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: flask-demo
-        image: 792300178540.dkr.ecr.us-west-2.amazonaws.com/wkacz:2.0.0
+        image: 026476643151.dkr.ecr.us-west-2.amazonaws.com/flask-demo:2.0.2
         ports:
         - containerPort: 8000
         imagePullPolicy: Always
