@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-demo-deployment
+  labels:
+    app: flask-demo  
+spec:
+  selector:
+    matchLabels:
+      app: flask-demo
+  replicas: 4 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: flask-demo
+    spec:
+      containers:
+      - name: flask-demo
+        image: 026476643151.dkr.ecr.us-west-2.amazonaws.com/flask-demo:2.0.2
+        ports:
+        - containerPort: 8000
+        imagePullPolicy: Always
+
